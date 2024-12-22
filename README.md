@@ -1,11 +1,11 @@
-# API Documentation
+# Dokumentasi API
 
-## Overview
-This API provides endpoints for user authentication and managing items (barang) in a store system. The API is secured with Laravel Sanctum authentication for protected endpoints.
+## Gambaran Umum
+API ini menyediakan endpoint untuk autentikasi pengguna dan manajemen barang dalam sistem toko. API diamankan dengan Laravel Sanctum untuk endpoint yang terproteksi.
 
-## Models
+## Model
 
-### User Model
+### Model User (Pengguna)
 ```php
 protected $fillable = [
     'id',
@@ -17,7 +17,7 @@ protected $fillable = [
 ];
 ```
 
-### Barang Model
+### Model Barang
 ```php
 protected $fillable = [
     'id',
@@ -28,27 +28,27 @@ protected $fillable = [
 ];
 ```
 
-## Authentication Endpoints
+## Endpoint Autentikasi
 
-### Register User
+### Registrasi Pengguna
 ```http
 POST /api/register
 
-Request Body:
+Body Request:
 {
     "name": "string",
     "email": "string",
     "password": "string",
     "nohp": "numeric",
-    "role": "string|optional"
+    "role": "string|opsional"
 }
 
-Validation Rules:
-- name: required, string, max:255
-- email: required, string, email, unique in users table
-- password: required, string, min:6
-- nohp: required, numeric
-- role: optional
+Aturan Validasi:
+- name: wajib diisi, string, maksimal 255 karakter
+- email: wajib diisi, string, format email, harus unik di tabel users
+- password: wajib diisi, string, minimal 6 karakter
+- nohp: wajib diisi, numerik
+- role: opsional
 
 Response 201:
 {
@@ -60,34 +60,34 @@ Response 201:
 ```http
 POST /api/login
 
-Request Body:
+Body Request:
 {
     "email": "string",
     "password": "string"
 }
 
-Validation Rules:
-- email: required, string, email
-- password: required, string
+Aturan Validasi:
+- email: wajib diisi, string, format email
+- password: wajib diisi, string
 
 Response 200:
 {
-    "token": "access_token_string"
+    "token": "string_token_akses"
 }
 
-Response 401 (Invalid credentials):
+Response 401 (Kredensial tidak valid):
 {
     "error": "email atau password salah"
 }
 ```
 
-## Protected Endpoints (Requires Authentication)
-All these endpoints require a valid Bearer token in the Authorization header:
+## Endpoint Terproteksi (Memerlukan Autentikasi)
+Semua endpoint ini memerlukan token Bearer yang valid di header Authorization:
 ```http
-Authorization: Bearer {your_token}
+Authorization: Bearer {token_anda}
 ```
 
-### Get All Barang
+### Mendapatkan Semua Barang
 ```http
 GET /api/barang
 
@@ -105,21 +105,21 @@ Response 200:
 ]
 ```
 
-### Create Barang
+### Membuat Barang Baru
 ```http
 POST /api/barang
 
-Request Body:
+Body Request:
 {
     "nama_barang": "string",
     "harga": "numeric",
     "stok": "numeric"
 }
 
-Validation Rules:
-- nama_barang: required, string, max:255
-- harga: required, numeric
-- stok: required, numeric
+Aturan Validasi:
+- nama_barang: wajib diisi, string, maksimal 255 karakter
+- harga: wajib diisi, numerik
+- stok: wajib diisi, numerik
 
 Response 201:
 {
@@ -133,7 +133,7 @@ Response 201:
 }
 ```
 
-### Get Single Barang
+### Mendapatkan Detail Barang
 ```http
 GET /api/barang/{id}
 
@@ -150,25 +150,25 @@ Response 200:
 
 Response 404:
 {
-    "message": "No query results for model [App\\Models\\Barang] {id}"
+    "message": "Data barang tidak ditemukan"
 }
 ```
 
-### Update Barang
+### Mengupdate Barang
 ```http
 PUT /api/barang/{id}
 
-Request Body:
+Body Request:
 {
     "nama_barang": "string",
     "harga": "numeric",
     "stok": "numeric"
 }
 
-Validation Rules:
-- nama_barang: required, string, max:255
-- harga: required, numeric
-- stok: required, numeric
+Aturan Validasi:
+- nama_barang: wajib diisi, string, maksimal 255 karakter
+- harga: wajib diisi, numerik
+- stok: wajib diisi, numerik
 
 Response 200:
 {
@@ -183,11 +183,11 @@ Response 200:
 
 Response 404:
 {
-    "message": "No query results for model [App\\Models\\Barang] {id}"
+    "message": "Data barang tidak ditemukan"
 }
 ```
 
-### Delete Barang
+### Menghapus Barang
 ```http
 DELETE /api/barang/{id}
 
@@ -198,17 +198,17 @@ Response 200:
 
 Response 404:
 {
-    "message": "No query results for model [App\\Models\\Barang] {id}"
+    "message": "Data barang tidak ditemukan"
 }
 ```
 
-## API Routes
+## Rute API
 ```php
-// Public routes
+// Rute publik
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-// Protected routes
+// Rute terproteksi
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('barang', [BarangController::class, 'index']);
     Route::post('barang', [BarangController::class, 'store']);
@@ -218,22 +218,22 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 ```
 
-## Security Features
-1. Authentication using Laravel Sanctum
-2. Input validation for all endpoints
-3. Protected routes requiring authentication
-4. Password hashing using Laravel's Hash facade
-5. Email uniqueness validation
-6. Proper error handling and status codes
+## Fitur Keamanan
+1. Autentikasi menggunakan Laravel Sanctum
+2. Validasi input untuk semua endpoint
+3. Rute terproteksi yang memerlukan autentikasi
+4. Enkripsi password menggunakan Laravel Hash
+5. Validasi keunikan email
+6. Penanganan error yang tepat
 
-## Database Relationships
-- Each Barang belongs to a User (penjual) through the `id_penjual` foreign key
-- Users can have multiple Barang records
+## Relasi Database
+- Setiap Barang terhubung dengan User (penjual) melalui foreign key `id_penjual`
+- User dapat memiliki banyak data Barang
 
-## Error Handling
-The API returns appropriate HTTP status codes:
-- 200: Successful operation
-- 201: Successfully created
-- 401: Unauthorized
-- 404: Resource not found
-- 422: Validation error
+## Penanganan Error
+API mengembalikan kode status HTTP yang sesuai:
+- 200: Operasi berhasil
+- 201: Berhasil membuat data baru
+- 401: Tidak terotentikasi
+- 404: Data tidak ditemukan
+- 422: Error validasi
