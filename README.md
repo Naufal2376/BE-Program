@@ -25,7 +25,7 @@ A RESTful API for an e-commerce platform built with Laravel, featuring user auth
 
 1. Clone the repository
 ```bash
-git clone <repository-url>
+git clone https://github.com/Naufal2376/BE-Program.git
 ```
 
 2. Install dependencies
