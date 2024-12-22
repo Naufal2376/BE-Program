@@ -1,239 +1,319 @@
-# API Documentation
+# 🛍️ Laravel E-commerce API
 
-## Overview
-This API provides endpoints for user authentication and managing items (barang) in a store system. The API is secured with Laravel Sanctum authentication for protected endpoints.
+A robust RESTful API built with Laravel for managing an e-commerce platform with multiple user roles, product management, and transaction processing.
 
-## Models
+## 📋 Features
 
-### User Model
-```php
-protected $fillable = [
-    'id',
-    'name',
-    'email',
-    'password',
-    'nohp',
-    'role'
-];
-```
+- User Authentication & Authorization
+- Multiple User Roles (Admin, Seller, User)
+- Product Management
+- Transaction Processing
+- Role-based Access Control
 
-### Barang Model
-```php
-protected $fillable = [
-    'id',
-    'nama_barang',
-    'harga',
-    'stok',
-    'id_penjual'
-];
-```
+## 🔑 Authentication
 
-## Authentication Endpoints
+The API uses Laravel Sanctum for authentication. All authenticated routes require a Bearer token.
 
 ### Register User
+
 ```http
 POST /api/register
+```
 
-Request Body:
+**Request Body:**
+```json
 {
     "name": "string",
     "email": "string",
     "password": "string",
-    "nohp": "numeric",
-    "role": "string|optional"
+    "nohp": "string",
+    "role": "user|penjual|admin" (optional)
 }
+```
 
-Validation Rules:
-- name: required, string, max:255
-- email: required, string, email, unique in users table
-- password: required, string, min:6
-- nohp: required, numeric
-- role: optional
-
-Response 201:
+**Response (201):**
+```json
 {
-    "message": "Registrasi user berhasil"
+    "status": "success",
+    "message": "Registrasi berhasil",
+    "data": {
+        "name": "string",
+        "email": "string",
+        "nohp": "string",
+        "role": "string"
+    }
 }
 ```
 
 ### Login
+
 ```http
 POST /api/login
+```
 
-Request Body:
+**Request Body:**
+```json
 {
     "email": "string",
     "password": "string"
 }
+```
 
-Validation Rules:
-- email: required, string, email
-- password: required, string
-
-Response 200:
+**Response (200):**
+```json
 {
-    "token": "access_token_string"
-}
-
-Response 401 (Invalid credentials):
-{
-    "error": "email atau password salah"
+    "status": "success",
+    "message": "Login berhasil",
+    "data": {
+        "user": {
+            "name": "string",
+            "email": "string",
+            "role": "string"
+        },
+        "token": "string"
+    }
 }
 ```
 
-## Protected Endpoints (Requires Authentication)
-All these endpoints require a valid Bearer token in the Authorization header:
-```http
-Authorization: Bearer {your_token}
-```
+## 📦 Products (Barang)
 
-### Get All Barang
+### List All Products
+
 ```http
 GET /api/barang
-
-Response 200:
-[
-    {
-        "id": "integer",
-        "nama_barang": "string",
-        "harga": "numeric",
-        "stok": "numeric",
-        "id_penjual": "integer",
-        "created_at": "timestamp",
-        "updated_at": "timestamp"
-    }
-]
 ```
 
-### Create Barang
+**Response (200):**
+```json
+{
+    "status": "success",
+    "data": [
+        {
+            "id": "integer",
+            "nama_barang": "string",
+            "harga": "integer",
+            "stok": "integer",
+            "id_penjual": "integer"
+        }
+    ]
+}
+```
+
+### Create Product (Seller/Admin Only)
+
 ```http
 POST /api/barang
+```
 
-Request Body:
+**Request Body:**
+```json
 {
     "nama_barang": "string",
-    "harga": "numeric",
-    "stok": "numeric"
-}
-
-Validation Rules:
-- nama_barang: required, string, max:255
-- harga: required, numeric
-- stok: required, numeric
-
-Response 201:
-{
-    "id": "integer",
-    "nama_barang": "string",
-    "harga": "numeric",
-    "stok": "numeric",
-    "id_penjual": "integer",
-    "created_at": "timestamp",
-    "updated_at": "timestamp"
+    "harga": "integer",
+    "stok": "integer"
 }
 ```
 
-### Get Single Barang
-```http
-GET /api/barang/{id}
-
-Response 200:
+**Response (201):**
+```json
 {
-    "id": "integer",
-    "nama_barang": "string",
-    "harga": "numeric",
-    "stok": "numeric",
-    "id_penjual": "integer",
-    "created_at": "timestamp",
-    "updated_at": "timestamp"
-}
-
-Response 404:
-{
-    "message": "No query results for model [App\\Models\\Barang] {id}"
+    "status": "success",
+    "data": {
+        "id": "integer",
+        "nama_barang": "string",
+        "harga": "integer",
+        "stok": "integer",
+        "id_penjual": "integer"
+    }
 }
 ```
 
-### Update Barang
+### Update Product (Seller/Admin Only)
+
 ```http
 PUT /api/barang/{id}
+```
 
-Request Body:
+**Request Body:**
+```json
 {
     "nama_barang": "string",
-    "harga": "numeric",
-    "stok": "numeric"
-}
-
-Validation Rules:
-- nama_barang: required, string, max:255
-- harga: required, numeric
-- stok: required, numeric
-
-Response 200:
-{
-    "id": "integer",
-    "nama_barang": "string",
-    "harga": "numeric",
-    "stok": "numeric",
-    "id_penjual": "integer",
-    "created_at": "timestamp",
-    "updated_at": "timestamp"
-}
-
-Response 404:
-{
-    "message": "No query results for model [App\\Models\\Barang] {id}"
+    "harga": "integer",
+    "stok": "integer"
 }
 ```
 
-### Delete Barang
+**Response (200):**
+```json
+{
+    "status": "success",
+    "data": {
+        "id": "integer",
+        "nama_barang": "string",
+        "harga": "integer",
+        "stok": "integer",
+        "id_penjual": "integer"
+    }
+}
+```
+
+### Delete Product (Seller/Admin Only)
+
 ```http
 DELETE /api/barang/{id}
+```
 
-Response 200:
+**Response (200):**
+```json
 {
+    "status": "success",
     "message": "Barang telah dihapus"
 }
+```
 
-Response 404:
+## 💰 Transactions (Transaksi)
+
+### Create Transaction
+
+```http
+POST /api/transaksi
+```
+
+**Request Body:**
+```json
 {
-    "message": "No query results for model [App\\Models\\Barang] {id}"
+    "barang_id": "integer",
+    "jumlah": "integer"
 }
 ```
 
-## API Routes
-```php
-// Public routes
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
-
-// Protected routes
-Route::middleware('auth:sanctum')->group(function () {
-    Route::get('barang', [BarangController::class, 'index']);
-    Route::post('barang', [BarangController::class, 'store']);
-    Route::get('barang/{id}', [BarangController::class, 'show']);
-    Route::put('barang/{id}', [BarangController::class, 'update']);
-    Route::delete('barang/{id}', [BarangController::class, 'destroy']);
-});
+**Response (201):**
+```json
+{
+    "message": "Transaksi berhasil dibuat",
+    "data": {
+        "id": "integer",
+        "user_id": "integer",
+        "barang_id": "integer",
+        "jumlah": "integer",
+        "total_harga": "integer",
+        "status": "string",
+        "barang": {
+            "id": "integer",
+            "nama_barang": "string",
+            "harga": "integer"
+        },
+        "user": {
+            "id": "integer",
+            "name": "string"
+        }
+    }
+}
 ```
 
-## Security Features
-1. Authentication using Laravel Sanctum
-2. Input validation for all endpoints
-3. Protected routes requiring authentication
-4. Password hashing using Laravel's Hash facade
-5. Email uniqueness validation
-6. Proper error handling and status codes
+### Update Transaction Status
 
-## Database Relationships
-- Each Barang belongs to a User (penjual) through the `id_penjual` foreign key
-- Users can have multiple Barang records
+```http
+PUT /api/transaksi/{id}/status
+```
 
-## Error Handling
-The API returns appropriate HTTP status codes:
-- 200: Successful operation
-- 201: Successfully created
-- 401: Unauthorized
-- 404: Resource not found
-- 422: Validation error
+**Request Body:**
+```json
+{
+    "status": "proses|selesai|batal"
+}
+```
+
+**Response (200):**
+```json
+{
+    "message": "Status transaksi berhasil diupdate",
+    "data": {
+        "id": "integer",
+        "status": "string"
+    }
+}
+```
+
+## 🔒 Authorization Rules
+
+### User Roles
+- **Admin**: Full access to all endpoints
+- **Seller**: Can manage their own products
+- **User**: Can view products and manage their own transactions
+
+### Role-specific Access
+1. **Admin**
+   - Full access to all endpoints
+   - Can view all transactions
+   - Can manage all products
+
+2. **Seller**
+   - Can create/update/delete their own products
+   - Can view all products
+   - Cannot access transaction endpoints
+
+3. **User**
+   - Can view all products
+   - Can create and manage their own transactions
+   - Cannot manage products
+
+## 🚀 Getting Started
+
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   composer install
+   ```
+3. Configure your `.env` file
+4. Run migrations:
+   ```bash
+   php artisan migrate
+   ```
+5. Generate application key:
+   ```bash
+   php artisan key:generate
+   ```
+6. Start the server:
+   ```bash
+   php artisan serve
+   ```
+
+## 💻 Technical Details
+
+- **Authentication**: Laravel Sanctum
+- **Database**: MySQL
+- **PHP Version**: 8.0+
+- **Laravel Version**: 9.0+
+
+## ⚠️ Error Responses
+
+The API returns appropriate HTTP status codes and error messages:
+
+- `400`: Bad Request
+- `401`: Unauthorized
+- `403`: Forbidden
+- `404`: Not Found
+- `422`: Validation Error
+- `500`: Server Error
+
+Example error response:
+```json
+{
+    "status": "error",
+    "message": "Error message here"
+}
+```
+
+## 🔄 Database Relationships
+
+- `User` has many `Transaksi`
+- `Transaksi` belongs to `User` and `Barang`
+- `Barang` belongs to `User` (as seller)
+
+## 📝 Notes
+
+- All authenticated routes require a valid Bearer token
+- Pagination is not implemented but can be added if needed
+- The API uses JSON responses exclusively
+- All dates are in UTC timezone
