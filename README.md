@@ -1,27 +1,75 @@
-# E-Commerce API Documentation 🛍️
+# 🛍️ E-Commerce API Documentation
 
-This documentation provides details about the available endpoints, request/response formats, and authentication requirements for the E-Commerce API.
+![Laravel](https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
+![PHP](https://img.shields.io/badge/PHP-777BB4?style=for-the-badge&logo=php&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-005C84?style=for-the-badge&logo=mysql&logoColor=white)
 
-## Table of Contents
-- [Authentication](#authentication)
-- [Public Endpoints](#public-endpoints)
-- [Protected Endpoints](#protected-endpoints)
-  - [User Endpoints](#user-endpoints)
-  - [Seller Endpoints](#seller-endpoints)
-  - [Admin Endpoints](#admin-endpoints)
+A RESTful API for an e-commerce platform built with Laravel, featuring user authentication, product management, and transaction processing.
 
-## Authentication
+## 📋 Table of Contents
+- [Requirements](#-requirements)
+- [Installation](#-installation)
+- [Authentication](#-authentication)
+- [API Endpoints](#-api-endpoints)
+  - [Auth Endpoints](#auth-endpoints)
+  - [Product Endpoints](#product-endpoints)
+  - [Transaction Endpoints](#transaction-endpoints)
 
-The API uses Laravel Sanctum for authentication. Protected routes require a Bearer token which can be obtained through the login endpoint.
+## 🔧 Requirements
+- PHP >= 8.0
+- Composer
+- MySQL
+- Laravel 9.x
 
-Include the token in the Authorization header:
+## 🚀 Installation
+
+1. Clone the repository
+```bash
+git clone <repository-url>
 ```
-Authorization: Bearer <your_token>
+
+2. Install dependencies
+```bash
+composer install
 ```
 
-## Public Endpoints
+3. Create and configure .env file
+```bash
+cp .env.example .env
+```
 
-### Register User
+4. Generate application key
+```bash
+php artisan key:generate
+```
+
+5. Run migrations
+```bash
+php artisan migrate
+```
+
+6. Install Sanctum
+```bash
+php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider"
+```
+
+7. Start the server
+```bash
+php artisan serve
+```
+
+## 🔐 Authentication
+
+This API uses Laravel Sanctum for authentication. Include the token in the Authorization header:
+```
+Authorization: Bearer {your-token}
+```
+
+## 📡 API Endpoints
+
+### Auth Endpoints
+
+#### Register User
 ```http
 POST /api/register
 ```
@@ -33,11 +81,11 @@ POST /api/register
     "email": "john@example.com",
     "password": "password123",
     "nohp": "081234567890",
-    "role": "user" // Optional (default: "user") - Available roles: "user", "penjual", "admin"
+    "role": "user" // Optional: "user", "penjual", or "admin"
 }
 ```
 
-**Success Response (201):**
+**Response (201):**
 ```json
 {
     "status": "success",
@@ -51,7 +99,7 @@ POST /api/register
 }
 ```
 
-### Login
+#### Login
 ```http
 POST /api/login
 ```
@@ -64,34 +112,30 @@ POST /api/login
 }
 ```
 
-**Success Response (200):**
+**Response (200):**
 ```json
 {
     "status": "success",
     "message": "Login berhasil",
     "data": {
         "user": {
-            "id": 1,
             "name": "John Doe",
             "email": "john@example.com",
-            "nohp": "081234567890",
             "role": "user"
         },
-        "token": "your_access_token"
+        "token": "your-access-token"
     }
 }
 ```
 
-## Protected Endpoints
+### Product Endpoints
 
-### Products (Barang)
-
-#### List All Products
+#### Get All Products
 ```http
 GET /api/barang
 ```
 
-**Success Response (200):**
+**Response (200):**
 ```json
 {
     "status": "success",
@@ -107,28 +151,7 @@ GET /api/barang
 }
 ```
 
-#### Get Product Details
-```http
-GET /api/barang/{id}
-```
-
-**Success Response (200):**
-```json
-{
-    "status": "success",
-    "data": {
-        "id": 1,
-        "nama_barang": "Product Name",
-        "harga": 100000,
-        "stok": 50,
-        "id_penjual": 1
-    }
-}
-```
-
-### Seller Endpoints
-
-#### Create Product
+#### Create Product (Seller/Admin Only)
 ```http
 POST /api/barang
 ```
@@ -142,7 +165,7 @@ POST /api/barang
 }
 ```
 
-**Success Response (201):**
+**Response (201):**
 ```json
 {
     "status": "success",
@@ -155,7 +178,7 @@ POST /api/barang
 }
 ```
 
-#### Update Product
+#### Update Product (Seller/Admin Only)
 ```http
 PUT /api/barang/{id}
 ```
@@ -169,7 +192,7 @@ PUT /api/barang/{id}
 }
 ```
 
-**Success Response (200):**
+**Response (200):**
 ```json
 {
     "status": "success",
@@ -183,12 +206,12 @@ PUT /api/barang/{id}
 }
 ```
 
-#### Delete Product
+#### Delete Product (Seller/Admin Only)
 ```http
 DELETE /api/barang/{id}
 ```
 
-**Success Response (200):**
+**Response (200):**
 ```json
 {
     "status": "success",
@@ -196,7 +219,7 @@ DELETE /api/barang/{id}
 }
 ```
 
-### User Endpoints
+### Transaction Endpoints
 
 #### Create Transaction
 ```http
@@ -211,7 +234,7 @@ POST /api/transaksi
 }
 ```
 
-**Success Response (201):**
+**Response (201):**
 ```json
 {
     "message": "Transaksi berhasil dibuat",
@@ -222,25 +245,22 @@ POST /api/transaksi
         "total_harga": 300000,
         "status": "proses",
         "barang": {
-            "id": 1,
             "nama_barang": "Product Name",
-            "harga": 150000,
-            "stok": 98
+            "harga": 150000
         },
         "user": {
-            "id": 1,
             "name": "John Doe"
         }
     }
 }
 ```
 
-#### List User Transactions
+#### Get User Transactions
 ```http
 GET /api/transaksi
 ```
 
-**Success Response (200):**
+**Response (200):**
 ```json
 [
     {
@@ -251,11 +271,10 @@ GET /api/transaksi
         "total_harga": 300000,
         "status": "proses",
         "barang": {
-            "id": 1,
-            "nama_barang": "Product Name"
+            "nama_barang": "Product Name",
+            "harga": 150000
         },
         "user": {
-            "id": 1,
             "name": "John Doe"
         }
     }
@@ -270,11 +289,11 @@ PUT /api/transaksi/{id}/status
 **Request Body:**
 ```json
 {
-    "status": "selesai" // Available statuses: "proses", "selesai", "batal"
+    "status": "selesai" // Options: "proses", "selesai", "batal"
 }
 ```
 
-**Success Response (200):**
+**Response (200):**
 ```json
 {
     "message": "Status transaksi berhasil diupdate",
@@ -285,58 +304,41 @@ PUT /api/transaksi/{id}/status
 }
 ```
 
-#### Delete Transaction
-```http
-DELETE /api/transaksi/{id}
-```
+## 🔒 Role-Based Access Control
 
-**Success Response (200):**
-```json
-{
-    "message": "Transaksi berhasil dihapus"
-}
-```
+The API implements three user roles:
+- **User**: Can view products and manage their own transactions
+- **Seller**: Can manage their own products
+- **Admin**: Has full access to all endpoints
 
-## Error Responses
+## ⚠️ Error Responses
 
-### Validation Error (422)
+**Validation Error (422):**
 ```json
 {
     "status": "error",
     "errors": {
-        "field": [
-            "Error message"
-        ]
+        "field": ["Error message"]
     }
 }
 ```
 
-### Authentication Error (401)
+**Authentication Error (401):**
 ```json
 {
     "status": "error",
-    "message": "Unauthenticated"
-}
-```
-
-### Authorization Error (403)
-```json
-{
     "message": "Unauthorized"
 }
 ```
 
-### Not Found Error (404)
+**Not Found Error (404):**
 ```json
 {
     "status": "error",
-    "message": "Not Found"
+    "message": "Resource not found"
 }
 ```
 
-## Notes
+## 📝 License
 
-- All protected endpoints require authentication using Bearer token
-- Dates are returned in ISO 8601 format
-- All monetary values are in IDR (Indonesian Rupiah)
-- The API will return appropriate HTTP status codes for success and error responses
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
