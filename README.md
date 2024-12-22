@@ -28,3 +28,18 @@ Pastikan Anda memiliki perangkat lunak berikut yang sudah terinstal:
    ```bash
    git clone https://github.com/username/be-program-laravel.git
    cd be-program-laravel
+2. **Instalasi Dependensi**: Jalankan perintah berikut untuk menginstal dependensi dengan Composer:
+   ```bash
+   composer install
+3. **Konfigurasi Lingkungan**: Salin file .env.example ke .env dan sesuaikan konfigurasi seperti URL database, JWT secret, dll:
+   ```bash
+   cp .env.example .env
+4. **Buat Kunci Aplikasi**: Jalankan perintah berikut untuk menghasilkan kunci aplikasi Laravel:
+   ```bash
+   php artisan key:generate
+5. **Migrasi Database**: Jalankan perintah berikut untuk membuat tabel di database menggunakan migrasi:
+   ```bash
+   php artisan migrate
+6. **Menjalankan Aplikasi**: Jalankan aplikasi menggunakan perintah berikut:
+   ```bash
+   php artisan serve
