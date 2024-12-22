@@ -1,21 +1,27 @@
-# 🛍️ Laravel E-commerce API
+# E-Commerce API Documentation 🛍️
 
-A robust RESTful API built with Laravel for managing an e-commerce platform with multiple user roles, product management, and transaction processing.
+This documentation provides details about the available endpoints, request/response formats, and authentication requirements for the E-Commerce API.
 
-## 📋 Features
+## Table of Contents
+- [Authentication](#authentication)
+- [Public Endpoints](#public-endpoints)
+- [Protected Endpoints](#protected-endpoints)
+  - [User Endpoints](#user-endpoints)
+  - [Seller Endpoints](#seller-endpoints)
+  - [Admin Endpoints](#admin-endpoints)
 
-- User Authentication & Authorization
-- Multiple User Roles (Admin, Seller, User)
-- Product Management
-- Transaction Processing
-- Role-based Access Control
+## Authentication
 
-## 🔑 Authentication
+The API uses Laravel Sanctum for authentication. Protected routes require a Bearer token which can be obtained through the login endpoint.
 
-The API uses Laravel Sanctum for authentication. All authenticated routes require a Bearer token.
+Include the token in the Authorization header:
+```
+Authorization: Bearer <your_token>
+```
+
+## Public Endpoints
 
 ### Register User
-
 ```http
 POST /api/register
 ```
@@ -23,30 +29,29 @@ POST /api/register
 **Request Body:**
 ```json
 {
-    "name": "string",
-    "email": "string",
-    "password": "string",
-    "nohp": "string",
-    "role": "user|penjual|admin" (optional)
+    "name": "John Doe",
+    "email": "john@example.com",
+    "password": "password123",
+    "nohp": "081234567890",
+    "role": "user" // Optional (default: "user") - Available roles: "user", "penjual", "admin"
 }
 ```
 
-**Response (201):**
+**Success Response (201):**
 ```json
 {
     "status": "success",
     "message": "Registrasi berhasil",
     "data": {
-        "name": "string",
-        "email": "string",
-        "nohp": "string",
-        "role": "string"
+        "name": "John Doe",
+        "email": "john@example.com",
+        "nohp": "081234567890",
+        "role": "user"
     }
 }
 ```
 
 ### Login
-
 ```http
 POST /api/login
 ```
@@ -54,53 +59,76 @@ POST /api/login
 **Request Body:**
 ```json
 {
-    "email": "string",
-    "password": "string"
+    "email": "john@example.com",
+    "password": "password123"
 }
 ```
 
-**Response (200):**
+**Success Response (200):**
 ```json
 {
     "status": "success",
     "message": "Login berhasil",
     "data": {
         "user": {
-            "name": "string",
-            "email": "string",
-            "role": "string"
+            "id": 1,
+            "name": "John Doe",
+            "email": "john@example.com",
+            "nohp": "081234567890",
+            "role": "user"
         },
-        "token": "string"
+        "token": "your_access_token"
     }
 }
 ```
 
-## 📦 Products (Barang)
+## Protected Endpoints
 
-### List All Products
+### Products (Barang)
 
+#### List All Products
 ```http
 GET /api/barang
 ```
 
-**Response (200):**
+**Success Response (200):**
 ```json
 {
     "status": "success",
     "data": [
         {
-            "id": "integer",
-            "nama_barang": "string",
-            "harga": "integer",
-            "stok": "integer",
-            "id_penjual": "integer"
+            "id": 1,
+            "nama_barang": "Product Name",
+            "harga": 100000,
+            "stok": 50,
+            "id_penjual": 1
         }
     ]
 }
 ```
 
-### Create Product (Seller/Admin Only)
+#### Get Product Details
+```http
+GET /api/barang/{id}
+```
 
+**Success Response (200):**
+```json
+{
+    "status": "success",
+    "data": {
+        "id": 1,
+        "nama_barang": "Product Name",
+        "harga": 100000,
+        "stok": 50,
+        "id_penjual": 1
+    }
+}
+```
+
+### Seller Endpoints
+
+#### Create Product
 ```http
 POST /api/barang
 ```
@@ -108,28 +136,26 @@ POST /api/barang
 **Request Body:**
 ```json
 {
-    "nama_barang": "string",
-    "harga": "integer",
-    "stok": "integer"
+    "nama_barang": "New Product",
+    "harga": 150000,
+    "stok": 100
 }
 ```
 
-**Response (201):**
+**Success Response (201):**
 ```json
 {
     "status": "success",
     "data": {
-        "id": "integer",
-        "nama_barang": "string",
-        "harga": "integer",
-        "stok": "integer",
-        "id_penjual": "integer"
+        "nama_barang": "New Product",
+        "harga": 150000,
+        "stok": 100,
+        "id_penjual": 1
     }
 }
 ```
 
-### Update Product (Seller/Admin Only)
-
+#### Update Product
 ```http
 PUT /api/barang/{id}
 ```
@@ -137,33 +163,32 @@ PUT /api/barang/{id}
 **Request Body:**
 ```json
 {
-    "nama_barang": "string",
-    "harga": "integer",
-    "stok": "integer"
+    "nama_barang": "Updated Product",
+    "harga": 200000,
+    "stok": 75
 }
 ```
 
-**Response (200):**
+**Success Response (200):**
 ```json
 {
     "status": "success",
     "data": {
-        "id": "integer",
-        "nama_barang": "string",
-        "harga": "integer",
-        "stok": "integer",
-        "id_penjual": "integer"
+        "id": 1,
+        "nama_barang": "Updated Product",
+        "harga": 200000,
+        "stok": 75,
+        "id_penjual": 1
     }
 }
 ```
 
-### Delete Product (Seller/Admin Only)
-
+#### Delete Product
 ```http
 DELETE /api/barang/{id}
 ```
 
-**Response (200):**
+**Success Response (200):**
 ```json
 {
     "status": "success",
@@ -171,10 +196,9 @@ DELETE /api/barang/{id}
 }
 ```
 
-## 💰 Transactions (Transaksi)
+### User Endpoints
 
-### Create Transaction
-
+#### Create Transaction
 ```http
 POST /api/transaksi
 ```
@@ -182,37 +206,63 @@ POST /api/transaksi
 **Request Body:**
 ```json
 {
-    "barang_id": "integer",
-    "jumlah": "integer"
+    "barang_id": 1,
+    "jumlah": 2
 }
 ```
 
-**Response (201):**
+**Success Response (201):**
 ```json
 {
     "message": "Transaksi berhasil dibuat",
     "data": {
-        "id": "integer",
-        "user_id": "integer",
-        "barang_id": "integer",
-        "jumlah": "integer",
-        "total_harga": "integer",
-        "status": "string",
+        "user_id": 1,
+        "barang_id": 1,
+        "jumlah": 2,
+        "total_harga": 300000,
+        "status": "proses",
         "barang": {
-            "id": "integer",
-            "nama_barang": "string",
-            "harga": "integer"
+            "id": 1,
+            "nama_barang": "Product Name",
+            "harga": 150000,
+            "stok": 98
         },
         "user": {
-            "id": "integer",
-            "name": "string"
+            "id": 1,
+            "name": "John Doe"
         }
     }
 }
 ```
 
-### Update Transaction Status
+#### List User Transactions
+```http
+GET /api/transaksi
+```
 
+**Success Response (200):**
+```json
+[
+    {
+        "id": 1,
+        "user_id": 1,
+        "barang_id": 1,
+        "jumlah": 2,
+        "total_harga": 300000,
+        "status": "proses",
+        "barang": {
+            "id": 1,
+            "nama_barang": "Product Name"
+        },
+        "user": {
+            "id": 1,
+            "name": "John Doe"
+        }
+    }
+]
+```
+
+#### Update Transaction Status
 ```http
 PUT /api/transaksi/{id}/status
 ```
@@ -220,100 +270,73 @@ PUT /api/transaksi/{id}/status
 **Request Body:**
 ```json
 {
-    "status": "proses|selesai|batal"
+    "status": "selesai" // Available statuses: "proses", "selesai", "batal"
 }
 ```
 
-**Response (200):**
+**Success Response (200):**
 ```json
 {
     "message": "Status transaksi berhasil diupdate",
     "data": {
-        "id": "integer",
-        "status": "string"
+        "id": 1,
+        "status": "selesai"
     }
 }
 ```
 
-## 🔒 Authorization Rules
+#### Delete Transaction
+```http
+DELETE /api/transaksi/{id}
+```
 
-### User Roles
-- **Admin**: Full access to all endpoints
-- **Seller**: Can manage their own products
-- **User**: Can view products and manage their own transactions
-
-### Role-specific Access
-1. **Admin**
-   - Full access to all endpoints
-   - Can view all transactions
-   - Can manage all products
-
-2. **Seller**
-   - Can create/update/delete their own products
-   - Can view all products
-   - Cannot access transaction endpoints
-
-3. **User**
-   - Can view all products
-   - Can create and manage their own transactions
-   - Cannot manage products
-
-## 🚀 Getting Started
-
-1. Clone the repository
-2. Install dependencies:
-   ```bash
-   composer install
-   ```
-3. Configure your `.env` file
-4. Run migrations:
-   ```bash
-   php artisan migrate
-   ```
-5. Generate application key:
-   ```bash
-   php artisan key:generate
-   ```
-6. Start the server:
-   ```bash
-   php artisan serve
-   ```
-
-## 💻 Technical Details
-
-- **Authentication**: Laravel Sanctum
-- **Database**: MySQL
-- **PHP Version**: 8.0+
-- **Laravel Version**: 9.0+
-
-## ⚠️ Error Responses
-
-The API returns appropriate HTTP status codes and error messages:
-
-- `400`: Bad Request
-- `401`: Unauthorized
-- `403`: Forbidden
-- `404`: Not Found
-- `422`: Validation Error
-- `500`: Server Error
-
-Example error response:
+**Success Response (200):**
 ```json
 {
-    "status": "error",
-    "message": "Error message here"
+    "message": "Transaksi berhasil dihapus"
 }
 ```
 
-## 🔄 Database Relationships
+## Error Responses
 
-- `User` has many `Transaksi`
-- `Transaksi` belongs to `User` and `Barang`
-- `Barang` belongs to `User` (as seller)
+### Validation Error (422)
+```json
+{
+    "status": "error",
+    "errors": {
+        "field": [
+            "Error message"
+        ]
+    }
+}
+```
 
-## 📝 Notes
+### Authentication Error (401)
+```json
+{
+    "status": "error",
+    "message": "Unauthenticated"
+}
+```
 
-- All authenticated routes require a valid Bearer token
-- Pagination is not implemented but can be added if needed
-- The API uses JSON responses exclusively
-- All dates are in UTC timezone
+### Authorization Error (403)
+```json
+{
+    "message": "Unauthorized"
+}
+```
+
+### Not Found Error (404)
+```json
+{
+    "status": "error",
+    "message": "Not Found"
+}
+```
+
+## Notes
+
+- All protected endpoints require authentication using Bearer token
+- Dates are returned in ISO 8601 format
+- All monetary values are in IDR (Indonesian Rupiah)
+- The API will return appropriate HTTP status codes for success and error responses
