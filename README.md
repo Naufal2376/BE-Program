@@ -1,327 +1,239 @@
-# Laravel API Documentation
+# API Documentation
 
 ## Overview
-This API provides endpoints for managing a store's inventory, products, and transactions. The API is secured with authentication and includes input validation for all endpoints.
+This API provides endpoints for user authentication and managing items (barang) in a store system. The API is secured with Laravel Sanctum authentication for protected endpoints.
 
-## Technology Stack
-- PHP 8.1
-- Laravel 10.x
-- MySQL 8.0
-- Laravel Sanctum (for authentication)
-- Laravel Validation
+## Models
 
-## Authentication
-All endpoints require authentication using Laravel Sanctum. To authenticate:
+### User Model
+```php
+protected $fillable = [
+    'id',
+    'name',
+    'email',
+    'password',
+    'nohp',
+    'role'
+];
+```
 
-1. First, obtain an API token:
+### Barang Model
+```php
+protected $fillable = [
+    'id',
+    'nama_barang',
+    'harga',
+    'stok',
+    'id_penjual'
+];
+```
+
+## Authentication Endpoints
+
+### Register User
 ```http
-POST /api/login
-Content-Type: application/json
+POST /api/register
 
+Request Body:
 {
-    "email": "user@example.com",
-    "password": "password"
+    "name": "string",
+    "email": "string",
+    "password": "string",
+    "nohp": "numeric",
+    "role": "string|optional"
+}
+
+Validation Rules:
+- name: required, string, max:255
+- email: required, string, email, unique in users table
+- password: required, string, min:6
+- nohp: required, numeric
+- role: optional
+
+Response 201:
+{
+    "message": "Registrasi user berhasil"
 }
 ```
 
-2. Use the token in subsequent requests:
+### Login
+```http
+POST /api/login
+
+Request Body:
+{
+    "email": "string",
+    "password": "string"
+}
+
+Validation Rules:
+- email: required, string, email
+- password: required, string
+
+Response 200:
+{
+    "token": "access_token_string"
+}
+
+Response 401 (Invalid credentials):
+{
+    "error": "email atau password salah"
+}
+```
+
+## Protected Endpoints (Requires Authentication)
+All these endpoints require a valid Bearer token in the Authorization header:
 ```http
 Authorization: Bearer {your_token}
 ```
 
-## Models
-
-### Product
-```php
-class Product extends Model
-{
-    protected $fillable = [
-        'name',
-        'description',
-        'price',
-        'stock',
-        'category_id'
-    ];
-
-    public function category()
-    {
-        return $this->belongsTo(Category::class);
-    }
-}
-```
-
-### Category
-```php
-class Category extends Model
-{
-    protected $fillable = [
-        'name',
-        'description'
-    ];
-
-    public function products()
-    {
-        return $this->hasMany(Product::class);
-    }
-}
-```
-
-### Transaction
-```php
-class Transaction extends Model
-{
-    protected $fillable = [
-        'user_id',
-        'total_amount',
-        'status'
-    ];
-
-    public function items()
-    {
-        return $this->hasMany(TransactionItem::class);
-    }
-}
-```
-
-## Controllers
-
-### ProductController
-Handles product-related operations:
-- List all products
-- Show single product
-- Create product
-- Update product
-- Delete product
-
-### CategoryController
-Manages product categories:
-- List all categories
-- Show single category
-- Create category
-- Update category
-- Delete category
-
-### TransactionController
-Handles purchase transactions:
-- Create new transaction
-- List user transactions
-- Show transaction details
-- Update transaction status
-
-## API Endpoints
-
-### Products
-
-#### List Products
+### Get All Barang
 ```http
-GET /api/products
+GET /api/barang
 
 Response 200:
-{
-    "data": [
-        {
-            "id": 1,
-            "name": "Product Name",
-            "description": "Product Description",
-            "price": 99.99,
-            "stock": 100,
-            "category_id": 1,
-            "created_at": "2024-12-22T10:00:00Z",
-            "updated_at": "2024-12-22T10:00:00Z"
-        }
-    ],
-    "meta": {
-        "current_page": 1,
-        "total": 50,
-        "per_page": 15
+[
+    {
+        "id": "integer",
+        "nama_barang": "string",
+        "harga": "numeric",
+        "stok": "numeric",
+        "id_penjual": "integer",
+        "created_at": "timestamp",
+        "updated_at": "timestamp"
     }
-}
+]
 ```
 
-#### Create Product
+### Create Barang
 ```http
-POST /api/products
-Content-Type: application/json
+POST /api/barang
 
-Request:
+Request Body:
 {
-    "name": "New Product",
-    "description": "Product Description",
-    "price": 99.99,
-    "stock": 100,
-    "category_id": 1
+    "nama_barang": "string",
+    "harga": "numeric",
+    "stok": "numeric"
 }
+
+Validation Rules:
+- nama_barang: required, string, max:255
+- harga: required, numeric
+- stok: required, numeric
 
 Response 201:
 {
-    "data": {
-        "id": 1,
-        "name": "New Product",
-        "description": "Product Description",
-        "price": 99.99,
-        "stock": 100,
-        "category_id": 1,
-        "created_at": "2024-12-22T10:00:00Z",
-        "updated_at": "2024-12-22T10:00:00Z"
-    }
+    "id": "integer",
+    "nama_barang": "string",
+    "harga": "numeric",
+    "stok": "numeric",
+    "id_penjual": "integer",
+    "created_at": "timestamp",
+    "updated_at": "timestamp"
 }
 ```
 
-### Categories
-
-#### List Categories
+### Get Single Barang
 ```http
-GET /api/categories
+GET /api/barang/{id}
 
 Response 200:
 {
-    "data": [
-        {
-            "id": 1,
-            "name": "Category Name",
-            "description": "Category Description",
-            "created_at": "2024-12-22T10:00:00Z",
-            "updated_at": "2024-12-22T10:00:00Z"
-        }
-    ]
+    "id": "integer",
+    "nama_barang": "string",
+    "harga": "numeric",
+    "stok": "numeric",
+    "id_penjual": "integer",
+    "created_at": "timestamp",
+    "updated_at": "timestamp"
+}
+
+Response 404:
+{
+    "message": "No query results for model [App\\Models\\Barang] {id}"
 }
 ```
 
-### Transactions
-
-#### Create Transaction
+### Update Barang
 ```http
-POST /api/transactions
-Content-Type: application/json
+PUT /api/barang/{id}
 
-Request:
+Request Body:
 {
-    "items": [
-        {
-            "product_id": 1,
-            "quantity": 2
-        }
-    ]
+    "nama_barang": "string",
+    "harga": "numeric",
+    "stok": "numeric"
 }
 
-Response 201:
+Validation Rules:
+- nama_barang: required, string, max:255
+- harga: required, numeric
+- stok: required, numeric
+
+Response 200:
 {
-    "data": {
-        "id": 1,
-        "total_amount": 199.98,
-        "status": "pending",
-        "items": [
-            {
-                "product_id": 1,
-                "quantity": 2,
-                "unit_price": 99.99
-            }
-        ],
-        "created_at": "2024-12-22T10:00:00Z"
-    }
+    "id": "integer",
+    "nama_barang": "string",
+    "harga": "numeric",
+    "stok": "numeric",
+    "id_penjual": "integer",
+    "created_at": "timestamp",
+    "updated_at": "timestamp"
 }
-```
 
-## Request Validation
-
-### ProductRequest
-```php
-class ProductRequest extends FormRequest
+Response 404:
 {
-    public function rules()
-    {
-        return [
-            'name' => 'required|string|max:255',
-            'description' => 'required|string',
-            'price' => 'required|numeric|min:0',
-            'stock' => 'required|integer|min:0',
-            'category_id' => 'required|exists:categories,id'
-        ];
-    }
+    "message": "No query results for model [App\\Models\\Barang] {id}"
 }
 ```
 
-### TransactionRequest
-```php
-class TransactionRequest extends FormRequest
+### Delete Barang
+```http
+DELETE /api/barang/{id}
+
+Response 200:
 {
-    public function rules()
-    {
-        return [
-            'items' => 'required|array|min:1',
-            'items.*.product_id' => 'required|exists:products,id',
-            'items.*.quantity' => 'required|integer|min:1'
-        ];
-    }
+    "message": "Barang telah dihapus"
+}
+
+Response 404:
+{
+    "message": "No query results for model [App\\Models\\Barang] {id}"
 }
 ```
-
-## Error Handling
-
-The API returns standard HTTP status codes and JSON error responses:
-
-```json
-{
-    "error": {
-        "message": "Error message here",
-        "code": "ERROR_CODE",
-        "details": {}
-    }
-}
-```
-
-Common status codes:
-- 400: Bad Request (validation errors)
-- 401: Unauthorized
-- 403: Forbidden
-- 404: Not Found
-- 422: Unprocessable Entity
-- 500: Internal Server Error
 
 ## API Routes
 ```php
-// routes/api.php
+// Public routes
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+
+// Protected routes
 Route::middleware('auth:sanctum')->group(function () {
-    // Product routes
-    Route::apiResource('products', ProductController::class);
-    
-    // Category routes
-    Route::apiResource('categories', CategoryController::class);
-    
-    // Transaction routes
-    Route::apiResource('transactions', TransactionController::class);
+    Route::get('barang', [BarangController::class, 'index']);
+    Route::post('barang', [BarangController::class, 'store']);
+    Route::get('barang/{id}', [BarangController::class, 'show']);
+    Route::put('barang/{id}', [BarangController::class, 'update']);
+    Route::delete('barang/{id}', [BarangController::class, 'destroy']);
 });
-
-// Authentication routes
-Route::post('login', [AuthController::class, 'login']);
-Route::post('register', [AuthController::class, 'register']);
 ```
 
-## Setup Instructions
+## Security Features
+1. Authentication using Laravel Sanctum
+2. Input validation for all endpoints
+3. Protected routes requiring authentication
+4. Password hashing using Laravel's Hash facade
+5. Email uniqueness validation
+6. Proper error handling and status codes
 
-1. Clone the repository
-2. Copy `.env.example` to `.env` and configure your database
-3. Run migrations: `php artisan migrate`
-4. Install dependencies: `composer install`
-5. Generate application key: `php artisan key:generate`
-6. Run the server: `php artisan serve`
+## Database Relationships
+- Each Barang belongs to a User (penjual) through the `id_penjual` foreign key
+- Users can have multiple Barang records
 
-## Security Measures
-
-1. **Authentication**: Using Laravel Sanctum for token-based authentication
-2. **Input Validation**: All requests are validated using Form Request classes
-3. **CORS Protection**: Configured in `config/cors.php`
-4. **Rate Limiting**: API routes are rate-limited
-5. **SQL Injection Protection**: Using Laravel's query builder and Eloquent ORM
-6. **XSS Protection**: Laravel's built-in XSS protection
-7. **CSRF Protection**: Enabled for web routes
-
-## Testing
-
-Run the test suite:
-```bash
-php artisan test
-```
-
-## License
-MIT License
+## Error Handling
+The API returns appropriate HTTP status codes:
+- 200: Successful operation
+- 201: Successfully created
+- 401: Unauthorized
+- 404: Resource not found
+- 422: Validation error
