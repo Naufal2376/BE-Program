@@ -1,30 +1,342 @@
-# BE-Program
+# E-Commerce API Documentation 🛍️
 
-## Deskripsi Proyek
+This documentation provides details about the available endpoints, request/response formats, and authentication requirements for the E-Commerce API.
 
-Proyek ini adalah backend untuk aplikasi [Nama Aplikasi], yang bertujuan untuk [deskripsikan tujuan aplikasi Anda]. Backend ini dibangun menggunakan [sebutkan bahasa pemrograman dan framework yang digunakan, misalnya Golang, Fiber, dll], dan dilengkapi dengan endpoint-endpoint untuk menangani operasi-operasi seperti [contoh: pendaftaran pengguna, login, manajemen produk, dll].
+## Table of Contents
+- [Authentication](#authentication)
+- [Public Endpoints](#public-endpoints)
+- [Protected Endpoints](#protected-endpoints)
+  - [User Endpoints](#user-endpoints)
+  - [Seller Endpoints](#seller-endpoints)
+  - [Admin Endpoints](#admin-endpoints)
 
-## Teknologi yang Digunakan
+## Authentication
 
-- **Bahasa Pemrograman**: [misalnya, Golang, JavaScript, dll]
-- **Framework**: [misalnya, GORM, Fiber, Express, dll]
-- **Database**: [misalnya, PostgreSQL, MySQL, MongoDB, dll]
-- **Autentikasi**: [misalnya, JWT, OAuth, dll]
+The API uses Laravel Sanctum for authentication. Protected routes require a Bearer token which can be obtained through the login endpoint.
 
-## Struktur Direktori
+Include the token in the Authorization header:
+```
+Authorization: Bearer <your_token>
+```
 
+## Public Endpoints
 
-## Setup dan Instalasi
+### Register User
+```http
+POST /api/register
+```
 
-### Prasyarat
-Pastikan Anda memiliki perangkat lunak berikut yang sudah terinstal:
-- [Git](https://git-scm.com/)
-- [Go](https://golang.org/dl/) (untuk Golang)
-- [Database yang dibutuhkan](https://www.postgresql.org/) (misalnya, PostgreSQL)
+**Request Body:**
+```json
+{
+    "name": "John Doe",
+    "email": "john@example.com",
+    "password": "password123",
+    "nohp": "081234567890",
+    "role": "user" // Optional (default: "user") - Available roles: "user", "penjual", "admin"
+}
+```
 
-### Langkah-langkah Instalasi
+**Success Response (201):**
+```json
+{
+    "status": "success",
+    "message": "Registrasi berhasil",
+    "data": {
+        "name": "John Doe",
+        "email": "john@example.com",
+        "nohp": "081234567890",
+        "role": "user"
+    }
+}
+```
 
-1. **Clone Repository**:
-   ```bash
-   git clone https://github.com/username/be-program.git
-   cd be-program
+### Login
+```http
+POST /api/login
+```
+
+**Request Body:**
+```json
+{
+    "email": "john@example.com",
+    "password": "password123"
+}
+```
+
+**Success Response (200):**
+```json
+{
+    "status": "success",
+    "message": "Login berhasil",
+    "data": {
+        "user": {
+            "id": 1,
+            "name": "John Doe",
+            "email": "john@example.com",
+            "nohp": "081234567890",
+            "role": "user"
+        },
+        "token": "your_access_token"
+    }
+}
+```
+
+## Protected Endpoints
+
+### Products (Barang)
+
+#### List All Products
+```http
+GET /api/barang
+```
+
+**Success Response (200):**
+```json
+{
+    "status": "success",
+    "data": [
+        {
+            "id": 1,
+            "nama_barang": "Product Name",
+            "harga": 100000,
+            "stok": 50,
+            "id_penjual": 1
+        }
+    ]
+}
+```
+
+#### Get Product Details
+```http
+GET /api/barang/{id}
+```
+
+**Success Response (200):**
+```json
+{
+    "status": "success",
+    "data": {
+        "id": 1,
+        "nama_barang": "Product Name",
+        "harga": 100000,
+        "stok": 50,
+        "id_penjual": 1
+    }
+}
+```
+
+### Seller Endpoints
+
+#### Create Product
+```http
+POST /api/barang
+```
+
+**Request Body:**
+```json
+{
+    "nama_barang": "New Product",
+    "harga": 150000,
+    "stok": 100
+}
+```
+
+**Success Response (201):**
+```json
+{
+    "status": "success",
+    "data": {
+        "nama_barang": "New Product",
+        "harga": 150000,
+        "stok": 100,
+        "id_penjual": 1
+    }
+}
+```
+
+#### Update Product
+```http
+PUT /api/barang/{id}
+```
+
+**Request Body:**
+```json
+{
+    "nama_barang": "Updated Product",
+    "harga": 200000,
+    "stok": 75
+}
+```
+
+**Success Response (200):**
+```json
+{
+    "status": "success",
+    "data": {
+        "id": 1,
+        "nama_barang": "Updated Product",
+        "harga": 200000,
+        "stok": 75,
+        "id_penjual": 1
+    }
+}
+```
+
+#### Delete Product
+```http
+DELETE /api/barang/{id}
+```
+
+**Success Response (200):**
+```json
+{
+    "status": "success",
+    "message": "Barang telah dihapus"
+}
+```
+
+### User Endpoints
+
+#### Create Transaction
+```http
+POST /api/transaksi
+```
+
+**Request Body:**
+```json
+{
+    "barang_id": 1,
+    "jumlah": 2
+}
+```
+
+**Success Response (201):**
+```json
+{
+    "message": "Transaksi berhasil dibuat",
+    "data": {
+        "user_id": 1,
+        "barang_id": 1,
+        "jumlah": 2,
+        "total_harga": 300000,
+        "status": "proses",
+        "barang": {
+            "id": 1,
+            "nama_barang": "Product Name",
+            "harga": 150000,
+            "stok": 98
+        },
+        "user": {
+            "id": 1,
+            "name": "John Doe"
+        }
+    }
+}
+```
+
+#### List User Transactions
+```http
+GET /api/transaksi
+```
+
+**Success Response (200):**
+```json
+[
+    {
+        "id": 1,
+        "user_id": 1,
+        "barang_id": 1,
+        "jumlah": 2,
+        "total_harga": 300000,
+        "status": "proses",
+        "barang": {
+            "id": 1,
+            "nama_barang": "Product Name"
+        },
+        "user": {
+            "id": 1,
+            "name": "John Doe"
+        }
+    }
+]
+```
+
+#### Update Transaction Status
+```http
+PUT /api/transaksi/{id}/status
+```
+
+**Request Body:**
+```json
+{
+    "status": "selesai" // Available statuses: "proses", "selesai", "batal"
+}
+```
+
+**Success Response (200):**
+```json
+{
+    "message": "Status transaksi berhasil diupdate",
+    "data": {
+        "id": 1,
+        "status": "selesai"
+    }
+}
+```
+
+#### Delete Transaction
+```http
+DELETE /api/transaksi/{id}
+```
+
+**Success Response (200):**
+```json
+{
+    "message": "Transaksi berhasil dihapus"
+}
+```
+
+## Error Responses
+
+### Validation Error (422)
+```json
+{
+    "status": "error",
+    "errors": {
+        "field": [
+            "Error message"
+        ]
+    }
+}
+```
+
+### Authentication Error (401)
+```json
+{
+    "status": "error",
+    "message": "Unauthenticated"
+}
+```
+
+### Authorization Error (403)
+```json
+{
+    "message": "Unauthorized"
+}
+```
+
+### Not Found Error (404)
+```json
+{
+    "status": "error",
+    "message": "Not Found"
+}
+```
+
+## Notes
+
+- All protected endpoints require authentication using Bearer token
+- Dates are returned in ISO 8601 format
+- All monetary values are in IDR (Indonesian Rupiah)
+- The API will return appropriate HTTP status codes for success and error responses
