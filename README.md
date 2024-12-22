@@ -1,30 +1,16 @@
-# BE-Program
+# BE-Program Laravel
 
 ## Deskripsi Proyek
 
-Proyek ini adalah backend untuk aplikasi [Nama Aplikasi], yang bertujuan untuk [deskripsikan tujuan aplikasi Anda]. Backend ini dibangun menggunakan [sebutkan bahasa pemrograman dan framework yang digunakan, misalnya Golang, Fiber, dll], dan dilengkapi dengan endpoint-endpoint untuk menangani operasi-operasi seperti [contoh: pendaftaran pengguna, login, manajemen produk, dll].
+Proyek ini adalah backend untuk aplikasi [Nama Aplikasi], yang dibangun menggunakan framework **Laravel**. Backend ini menyediakan berbagai endpoint API untuk operasi-operasi seperti pendaftaran pengguna, login, manajemen produk, dan lainnya.
 
 ## Teknologi yang Digunakan
 
-- **Bahasa Pemrograman**: [misalnya, Golang, JavaScript, dll]
-- **Framework**: [misalnya, GORM, Fiber, Express, dll]
-- **Database**: [misalnya, PostgreSQL, MySQL, MongoDB, dll]
-- **Autentikasi**: [misalnya, JWT, OAuth, dll]
+- **Framework**: Laravel
+- **Bahasa Pemrograman**: PHP
+- **Database**: [Misalnya MySQL, PostgreSQL, dll]
+- **Autentikasi**: JWT (JSON Web Token) untuk autentikasi API
+- **ORM**: Eloquent
 
 ## Struktur Direktori
 
-
-## Setup dan Instalasi
-
-### Prasyarat
-Pastikan Anda memiliki perangkat lunak berikut yang sudah terinstal:
-- [Git](https://git-scm.com/)
-- [Go](https://golang.org/dl/) (untuk Golang)
-- [Database yang dibutuhkan](https://www.postgresql.org/) (misalnya, PostgreSQL)
-
-### Langkah-langkah Instalasi
-
-1. **Clone Repository**:
-   ```bash
-   git clone https://github.com/username/be-program.git
-   cd be-program
